@@ -9,22 +9,26 @@ const port = 3000
 app.use(express.json());
 
 function authorize(req, res, next) {
+  req.isAuthorized = true;
   // Check if Authorization header is present
 
   const authHeader = req.headers.authorization;
 
-  // Allow GET requests without token
-  if (req.method === 'GET') {
-      return next();
-  }
-
   // For other methods, require token
   if (!authHeader) {
+      req.isAuthorized = false;
+      if (req.method === 'GET') {
+          return next();
+      }
       return res.status(401).send('Authorization header is missing');
   }
 
   // Validate the token (e.g., against a database or some other mechanism)
   if (authHeader !== process.env.SECRET_KEY) {
+      req.isAuthorized = false;
+      if (req.method === 'GET') {
+          return next();
+      }
       return res.status(403).send('Invalid token');
   }
 
@@ -50,3 +54,7 @@ loadRoutesFromDirectory(apiDirectory);
 app.listen(port, () => {
   console.log("Server Listening on PORT:", port);
 })
+
+
+//load discord bot
+require("./discordBot.js")
