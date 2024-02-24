@@ -16,6 +16,7 @@ module.exports = {
 			.setDescription('Prisen itemens pris skal ændres til')
             .setRequired(true)
         ),
+	aliases: ["setprice"],
 	async execute(interaction) {
 		const itemName = interaction.options.getString('item');
 		const itemValue = interaction.options.getInteger('pris');

@@ -24,6 +24,7 @@ async function addItem(itemName, itemValue) {
             const updateValues = [itemValue, itemName];
             const updateResult = await pool.query(updateQuery, updateValues);
             // After updating the value, delete the cached value associated with getItemByName
+            Cache[itemName] = undefined;
             return updateResult.rows[0];
         } else {
             // If the item does not exist, insert a new record
@@ -31,6 +32,7 @@ async function addItem(itemName, itemValue) {
             const insertValues = [itemName, itemValue];
             const insertResult = await pool.query(insertQuery, insertValues);
             // After adding a new item, delete the cached value associated with getItemByName
+            Cache[itemName] = undefined;
             return insertResult.rows[0];
         }
     } catch (error) {
@@ -62,8 +64,48 @@ async function getItemByName(itemName, ignoreCache) {
     }
 }
 
+async function getItemsByNames(itemNames, ignoreCache) {
+    const cachedItems = {};
+    const uncachedItems = [];
+
+    // Filter out cached items and collect uncached items
+    for (const itemName of itemNames) {
+        if (!ignoreCache && Cache[itemName] !== undefined) {
+            cachedItems[itemName] = Cache[itemName];
+        } else {
+            uncachedItems.push(itemName);
+        }
+    }
+    
+
+    // If all items are cached, return cached values
+    if (uncachedItems.length === 0) {
+        return cachedItems;
+    }
+
+    const query = 'SELECT * FROM items WHERE name = ANY($1)';
+    const values = [uncachedItems];
+
+    try {
+        const result = await pool.query(query, values);
+        const items = result.rows;
+
+        // Cache retrieved values
+        for (const item of items) {
+            Cache[item.name] = item.value;
+            cachedItems[item.name] = item.value;
+        }
+
+        return cachedItems;
+    } catch (error) {
+        console.error('Error getting items from the database:', error);
+        throw error;
+    }
+}
+
 // Export the functions to be used in other modules
 module.exports = {
     addItem,
-    getItemByName
+    getItemByName,
+    getItemsByNames
 };
