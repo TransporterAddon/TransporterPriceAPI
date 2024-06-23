@@ -28,7 +28,7 @@ module.exports = {
 			}
 
 			for (message in result) {
-    				await interaction.reply(message);
+    				await interaction.followUp(result[message]);
 			}	
 			return;
 		}
