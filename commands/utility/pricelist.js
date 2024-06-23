@@ -15,7 +15,7 @@ module.exports = {
 			let index = 0;
 
 			Object.entries(items).forEach(item => {
-				let reply += "- " + item[0] + ": " + item[1] + " EMs\n";
+				let reply = "- " + item[0] + ": " + item[1] + " EMs\n";
 				if(replies[index].length + reply.length > 2000){
 					index += 1;
 					replies[index] = "";
