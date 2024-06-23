@@ -35,7 +35,7 @@ module.exports = {
 			}
 
 			for (message in result) {
-    				await interaction.reply(message);
+    				await interaction.followUp(message);
 			}	
 			return;
 		}
