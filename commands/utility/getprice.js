@@ -24,7 +24,7 @@ module.exports = {
 			
 			while (index < str.length) {
 				result.push(str.substr(index, 2000));
-				index += maxLength;
+				index += 2000;
 			}
 
 			for (message in result) {
